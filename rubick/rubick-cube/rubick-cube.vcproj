@@ -182,6 +182,10 @@
 				RelativePath=".\shader.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\TextureManager\TextureManager.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -190,6 +194,10 @@
 			>
 			<File
 				RelativePath=".\shader.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TextureManager\TextureManager.h"
 				>
 			</File>
 		</Filter>
