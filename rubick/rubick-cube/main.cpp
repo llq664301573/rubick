@@ -1,5 +1,6 @@
 #include "shader.hpp"
 #include "TextureManager/TextureManager.h"
+#include "Cube.h"
 
 #include <GL/glew.h>
 #pragma comment(lib, "opengl32.lib")
@@ -25,8 +26,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
+
+vector<Cube*> cubes;
+
 int main(void)
 {
+	Cube::init(cubes, 6, 4, 3);
+
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
@@ -61,10 +67,10 @@ int main(void)
 
 	GLuint matrixID = glGetUniformLocation(programID, "MVP");
 
-	mat4 Projection = perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	mat4 View = lookAt(vec3(0,0,10), vec3(0,0,0), vec3(0,1,0));
-	mat4 Model = rotate(mat4(), 45.0f, vec3(1, 0, 0)) * rotate(mat4(), 45.0f, vec3(0, 1, 0));
-	mat4 MVP = Projection * View * Model;
+	mat4 projection = perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	mat4 view = lookAt(vec3(0,0,20), vec3(0,0,0), vec3(0,1,0));
+	mat4 model = rotate(mat4(), 45.0f, vec3(1, 0, 0)) * rotate(mat4(), 45.0f, vec3(0, 1, 0));
+	mat4 mvp = projection * view * model;
 
 
 	const GLuint Texture = 1000;
@@ -190,7 +196,6 @@ int main(void)
 
 		glUseProgram(programID);
 
-		glUniformMatrix4fv(matrixID, 1, GL_FALSE, (float*)&MVP);
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
@@ -221,8 +226,14 @@ int main(void)
 			);
 
 
-		glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
+		for (int i=0;i<cubes.size();i++)
+		{
+			mat4 MVP = mvp * cubes[i]->model;
+			glUniformMatrix4fv(matrixID, 1, GL_FALSE, (float*)&MVP);
+			glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+		}
+		
 
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
