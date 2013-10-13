@@ -68,7 +68,7 @@ int main(void)
 
 
 	const GLuint Texture = 1000;
-	TextureManager::Inst()->LoadTexture("images/cube.tga", Texture, GL_BGRA);
+	TextureManager::Inst()->LoadTexture("images/cube.png", Texture, GL_BGRA);
 	GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
 	const GLfloat vertex_buffer_data[] = { 
