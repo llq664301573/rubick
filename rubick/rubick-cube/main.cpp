@@ -11,8 +11,10 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 using namespace glm;
 
+#define M_PI 3.141592654f
 typedef unsigned char byte;
 
 void error_callback(int error, const char* description)
@@ -26,6 +28,60 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
+int width, height;
+
+vec3 trackball_ptov(int x, int y)
+{
+	/* project x,y onto a hemisphere centered within width, height , note z is up here*/
+	vec3 v;
+	v.x = (2.0f*x - width) / width;
+	v.y = (height - 2.0f*y) / height;    
+	float d = sqrt(v.x*v.x + v.y*v.y);
+	v.z = cos(M_PI/2.0f * ((d < 1.0f) ? d : 1.0f));
+	
+	return normalize(v);
+}
+
+mat4 camera;
+
+ivec2 lastpos;
+bool mouseButtonRightReleased = true;
+
+void mousebutton_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+		mouseButtonRightReleased = true;
+
+	if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		lastpos.x = xpos;
+		lastpos.y = ypos;
+
+		mouseButtonRightReleased = false;
+	}
+}
+
+void cursorpos_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if(!mouseButtonRightReleased)//Êó±êÓÒ¼üÍÏ¶¯
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		
+		vec3 v1 = trackball_ptov(lastpos.x, lastpos.y);
+		vec3 v2 = trackball_ptov(xpos, ypos);
+
+		vec3 axis = cross(v1, v2);
+		float angle = acos(dot(v1, v2)) * 180 / M_PI;
+
+		camera = rotate(mat4(), angle, axis) * camera;//mat4_cast(angleAxis(angle, axis))ÓÐbug
+
+		lastpos.x = xpos;
+		lastpos.y = ypos;
+	}
+}
 
 vector<Cube*> cubes;
 
@@ -50,6 +106,8 @@ int main(void)
 
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
+	glfwSetMouseButtonCallback(window, mousebutton_callback);
+	glfwSetCursorPosCallback(window, cursorpos_callback);
 
 	// Initialize GLEW
 	glewExperimental = true; // Needed for core profile
@@ -69,9 +127,8 @@ int main(void)
 
 	mat4 projection = perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	mat4 view = lookAt(vec3(0,0,20), vec3(0,0,0), vec3(0,1,0));
-	mat4 model = rotate(mat4(), 45.0f, vec3(1, 0, 0)) * rotate(mat4(), 45.0f, vec3(0, 1, 0));
-	mat4 mvp = projection * view * model;
 
+	camera = rotate(mat4(), 45.0f, vec3(1, 0, 0)) * rotate(mat4(), 45.0f, vec3(0,1,0));
 
 	const GLuint Texture = 1000;
 	TextureManager::Inst()->LoadTexture("images/cube.png", Texture, GL_BGRA);
@@ -185,17 +242,13 @@ int main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		float ratio;
-		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
-		ratio = width / (float) height;
 		glViewport(0, 0, width, height);
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
-
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
@@ -226,10 +279,9 @@ int main(void)
 			);
 
 
-
 		for (int i=0;i<cubes.size();i++)
 		{
-			mat4 MVP = mvp * cubes[i]->model;
+			mat4 MVP = projection * view * camera * cubes[i]->model;
 			glUniformMatrix4fv(matrixID, 1, GL_FALSE, (float*)&MVP);
 			glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 		}
