@@ -247,6 +247,8 @@ int main(void)
 	glDeleteProgram(programID);
 	glDeleteVertexArrays(1, &VertexArrayID);
 
+	Cube::clear(cubes);
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	exit(EXIT_SUCCESS);

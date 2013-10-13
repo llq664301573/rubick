@@ -23,3 +23,14 @@ void Cube::init(vector<Cube*> &cubes, const int xSize, const int ySize, const in
 		}
 	}
 }
+
+void Cube::clear(vector<Cube*> &cubes)
+{
+	for (int i=0;i<cubes.size();i++)
+	{
+		delete cubes[i];
+		cubes[i] = NULL;
+	}
+
+	cubes.clear();
+}

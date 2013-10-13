@@ -15,6 +15,7 @@ public:
 	Cube(int8 x, int8 y, int8 z);
 
 	static void init(vector<Cube*> &cubes, const int xSize = 3, const int ySize = 3, const int zSize = 3);
+	static void clear(vector<Cube*> &cubes);
 
 	mat4 model;
 };
