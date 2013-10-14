@@ -175,7 +175,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\callback.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\constant.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Cube.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\global.cpp"
 				>
 			</File>
 			<File
@@ -190,6 +202,10 @@
 				RelativePath=".\TextureManager\TextureManager.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\utility.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -197,7 +213,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\callback.h"
+				>
+			</File>
+			<File
+				RelativePath=".\constant.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Cube.h"
+				>
+			</File>
+			<File
+				RelativePath=".\global.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Pick.h"
 				>
 			</File>
 			<File
@@ -206,6 +238,10 @@
 			</File>
 			<File
 				RelativePath=".\TextureManager\TextureManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utility.h"
 				>
 			</File>
 		</Filter>
