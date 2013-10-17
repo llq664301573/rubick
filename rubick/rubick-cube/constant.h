@@ -1,11 +1,7 @@
-#ifndef CONSTANT_H
-#define CONSTANT_H
+#pragma once
 
-#include <glm/glm.hpp>
-using namespace glm;
+#include "common.h"
 
 extern const vec3 eye;//ÉãÏñ»úÎ»ÖÃ
 extern const float vertex_buffer_data[36*3];
 extern const float uv_buffer_data[36*2];
-
-#endif

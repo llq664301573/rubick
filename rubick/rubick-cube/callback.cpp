@@ -1,5 +1,9 @@
 #include "callback.h"
 
+#include "Picker.h"
+#include "utility.h"
+#include "global.h"
+
 void error_callback(int error, const char* description)
 {
 	fputs(description, stderr);
@@ -34,47 +38,9 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods)
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 
-		vec4 v;
-		v.x = (2.0f*xpos - width) / width;
-		v.y = (height - 2.0f*ypos) / height;  
-		v.z = -1.0f;//[-1, 1] 由近及远
-		v.w = 1;
+		picker.picking(xpos, ypos, width, height);
 
-		// Transform the screen space Pick ray into 3D space
-		//v = inverse(projection * view) * v;
-		v = inverse(projection) * v;
-		v = inverse(view) * v;
-
-		vec3 vPickRayOrig = vec3(v.x / v.w, v.y / v.w, v.z / v.w);//屏幕鼠标点世界空间坐标
-		vec3 vPickRayDir = vPickRayOrig - eye;
-
-		float distance = FLT_MAX;
-		for (int i=0;i<cubes.size();i++)
-		{
-			static int cnt = 0;
-			for (int j=0;j<12;j++)//每个立方体十二个三角形
-			{
-				const float *pbuffer = vertex_buffer_data + j * 9;
-
-				vec3 vertex[3];
-				for (int k=0;k<3;k++)//三角形上三点
-				{
-					vec4 v = vec4(pbuffer[k*3], pbuffer[k*3+1], pbuffer[k*3+2], 1);
-					v = camera * scroll * cubes[i]->model * v;//变换到世界空间
-
-					vertex[k] = vec3(v.x, v.y, v.z);
-				}
-
-				float t, u, v;
-				if(IntersectTriangle(vPickRayOrig, vPickRayDir, vertex[0], vertex[1], vertex[2], &t, &u, &v) && t < distance)
-				{
-					pick.cube = i;
-					pick.index = j * 3;
-
-					distance = t;
-				}
-			}
-		}
+		picker.tryRotary();
 	}
 }
 

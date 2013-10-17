@@ -47,7 +47,7 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="0"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -187,11 +187,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Face.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\global.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Picker.cpp"
 				>
 			</File>
 			<File
@@ -217,6 +225,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\common.h"
+				>
+			</File>
+			<File
 				RelativePath=".\constant.h"
 				>
 			</File>
@@ -225,15 +237,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Face.h"
+				>
+			</File>
+			<File
 				RelativePath=".\global.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Pick.h"
+				RelativePath=".\Picker.h"
 				>
 			</File>
 			<File
-				RelativePath=".\shader.hpp"
+				RelativePath=".\shader.h"
 				>
 			</File>
 			<File

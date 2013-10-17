@@ -1,12 +1,24 @@
 #include "global.h"
+#include "callback.h"
+#include "constant.h"
+#include "Cube.h"
+#include "Picker.h"
+#include "shader.h"
+#include "TextureManager/TextureManager.h"
 
-int main(void)
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glew32sd.lib")
+#pragma comment(lib, "glfw3.lib")
+
+#pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
+
+int main()
 {
-	Cube::init(cubes, 6, 4, 3);
+	Cube::init(cubes, 4, 4, 5);
 
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit())
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -16,7 +28,7 @@ int main(void)
 	if (!window)
 	{
 		glfwTerminate();
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
 
 	glfwMakeContextCurrent(window);
@@ -29,7 +41,7 @@ int main(void)
 	glewExperimental = true; // Needed for core profile
 	if (glewInit() != GLEW_OK) {
 		fprintf(stderr, "Failed to initialize GLEW\n");
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	GLuint VertexArrayID;
@@ -75,7 +87,6 @@ int main(void)
 		glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
 
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
@@ -96,7 +107,7 @@ int main(void)
 			GL_FALSE,           // normalized?
 			0,                  // stride
 			(void*)0            // array buffer offset
-			);
+		);
 
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
@@ -107,26 +118,70 @@ int main(void)
 			GL_FALSE,           // normalized?
 			0,                  // stride
 			(void*)0            // array buffer offset
-			);
+		);
 
+		picker.angle -= 15;
 		for (int i=0;i<cubes.size();i++)
 		{
-			mat4 MVP = projection * view * camera * scroll * cubes[i]->model;
+			Cube* cube = cubes[i];
+
+			mat4 MVP;
+			if(picker.face[0] != NULL && picker.face[1] != NULL)
+			{
+				//printf("%f %f %f\n", pickRotation.axis.x, pickRotation.axis.y, pickRotation.axis.z);
+				
+
+				const vec3& pivot = picker.rotation.pivot;
+				const vec3& axis = picker.rotation.axis;
+				mat4 rotMatrix = rotate(mat4(), 15.0f, axis);
+				const vec3& v1 = picker.face[0]->center;
+				const vec3& v2 = picker.face[1]->center;
+				if(pivot.x == v1.x && pivot.x == v2.x)
+				{
+					if(cube->pos.x == pivot.x)
+					{
+						cube->pickMatirx = rotMatrix * cube->pickMatirx;
+						cube->pos = rotMatrix * cube->pos;
+
+						if(picker.angle == 0)
+							cube->pos = round(cube->pos);
+					}
+				}
+				else if(pivot.y == v1.y && pivot.y == v2.y)
+				{
+					if(cube->pos.y == pivot.y)
+					{
+						cube->pickMatirx = rotMatrix * cube->pickMatirx;
+						cube->pos = rotMatrix * cube->pos;
+
+						if(picker.angle == 0)
+							cube->pos = round(cube->pos);
+					}
+				}
+				else
+				{
+					if(cube->pos.z == pivot.z)
+					{
+						cube->pickMatirx = rotMatrix * cube->pickMatirx;
+						cube->pos = rotMatrix * cube->pos;
+
+						if(picker.angle == 0)
+							cube->pos = round(cube->pos);
+					}
+				}	
+			}
+
+			MVP = projection * view * camera * scroll * cube->pickMatirx * cube->modelMatrix;
+			
 			glUniformMatrix4fv(matrixID, 1, GL_FALSE, (float*)&MVP);
 			glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 		}
 
 		glDisableVertexAttribArray(1);
-
-		if(pick.cube != -1)//Ê°È¡µ½µÄcube
-		{
-			mat4 MVP = projection * view * camera * scroll * cubes[pick.cube]->model;
-			glUniformMatrix4fv(matrixID, 1, GL_FALSE, (float*)&MVP);
-
-			glDrawArrays(GL_TRIANGLES, pick.index, 3);
-		}
-		
 		glDisableVertexAttribArray(0);
+
+		if(picker.angle == 0)
+			picker.face[0] = picker.face[1] = NULL;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -141,5 +196,6 @@ int main(void)
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
-	exit(EXIT_SUCCESS);
+	
+	return EXIT_SUCCESS;
 }

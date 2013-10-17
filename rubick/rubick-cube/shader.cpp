@@ -1,4 +1,4 @@
-#include "shader.hpp"
+#include "shader.h"
 
 GLuint loadShaders(int n, ...)
 {
