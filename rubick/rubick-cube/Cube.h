@@ -8,7 +8,7 @@ class Cube
 public:
 	Cube(int8 x, int8 y, int8 z, int index);
 
-	static void init(vector<Cube*> &cubes, const int xSize = 3, const int ySize = 3, const int zSize = 3);
+	static bool init(vector<Cube*> &cubes);
 	static void clear(vector<Cube*> &cubes);
 
 	static vec3 size;

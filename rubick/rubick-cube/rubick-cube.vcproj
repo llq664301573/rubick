@@ -41,13 +41,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\externals\glew-1.10.0\include;..\externals\glfw-3.0.3\include;..\externals\glm"
+				AdditionalIncludeDirectories="..\externals\libconfig-1.4.9\include;..\externals\glew-1.10.0\include;..\externals\glfw-3.0.3\include;..\externals\glm"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;GLEW_STATIC"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="0"
+				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -116,12 +116,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\externals\glew-1.10.0\include;..\externals\glfw-3.0.3\include;..\externals\glm"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				AdditionalIncludeDirectories="..\externals\libconfig-1.4.9\include;..\externals\glew-1.10.0\include;..\externals\glfw-3.0.3\include;..\externals\glm"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;GLEW_STATIC"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="0"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -137,6 +137,8 @@
 				Name="VCLinkerTool"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\externals\lib"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -266,6 +268,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath="..\env\config.cfg"
+				>
+			</File>
 			<Filter
 				Name="shaders"
 				>

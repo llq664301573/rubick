@@ -30,7 +30,7 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods)
 		mouseButtonRightReleased = false;
 	}
 
-	if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	if(button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
@@ -40,7 +40,13 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods)
 
 		picker.picking(xpos, ypos, width, height);
 
-		picker.tryRotary();
+		if(action == GLFW_RELEASE)
+		{
+			if(xpos < 0 || xpos >= width || ypos < 0 || ypos > height)
+				picker.face[0] = picker.face[1] = NULL;
+			else
+				picker.tryRotary();
+		}
 	}
 }
 
@@ -53,6 +59,9 @@ void cursorpos_callback(GLFWwindow* window, double xpos, double ypos)
 
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
+
+		if(xpos < 0 || xpos >= width || ypos < 0 || ypos > height)
+			return ;
 
 		vec3 v1 = trackball_ptov(mouseButtonRightLastpos.x, mouseButtonRightLastpos.y, width, height);
 		vec3 v2 = trackball_ptov(xpos, ypos, width, height);

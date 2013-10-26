@@ -7,14 +7,20 @@
 #include "TextureManager/TextureManager.h"
 
 #pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glew32sd.lib")
-#pragma comment(lib, "glfw3.lib")
 
+#ifdef _DEBUG
+#pragma comment(lib, "glew32sd.lib")
+#pragma comment(lib, "glfw3d.lib")
+#else
+#pragma comment(lib, "glew32s.lib")
+#pragma comment(lib, "glfw3.lib")
 #pragma comment( linker, "/subsystem:windows /entry:mainCRTStartup" )
+#endif // _DEBUG
+
 
 int main()
 {
-	Cube::init(cubes, 4, 4, 5);
+	Cube::init(cubes);
 
 	glfwSetErrorCallback(error_callback);
 	if (!glfwInit())
@@ -128,9 +134,6 @@ int main()
 			mat4 MVP;
 			if(picker.face[0] != NULL && picker.face[1] != NULL)
 			{
-				//printf("%f %f %f\n", pickRotation.axis.x, pickRotation.axis.y, pickRotation.axis.z);
-				
-
 				const vec3& pivot = picker.rotation.pivot;
 				const vec3& axis = picker.rotation.axis;
 				mat4 rotMatrix = rotate(mat4(), 15.0f, axis);
