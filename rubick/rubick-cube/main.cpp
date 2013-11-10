@@ -42,6 +42,7 @@ int main()
 	glfwSetMouseButtonCallback(window, mousebutton_callback);
 	glfwSetCursorPosCallback(window, cursorpos_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetWindowSizeCallback(window, windowsize_callback);
 
 	// Initialize GLEW
 	glewExperimental = true; // Needed for core profile
@@ -89,10 +90,6 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
-		glViewport(0, 0, width, height);
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
@@ -126,7 +123,10 @@ int main()
 			(void*)0            // array buffer offset
 		);
 
-		picker.angle -= 15;
+		const float delta = 15;
+		if(picker.angle > 0)
+			picker.angle -= delta;
+
 		for (int i=0;i<cubes.size();i++)
 		{
 			Cube* cube = cubes[i];
@@ -136,7 +136,7 @@ int main()
 			{
 				const vec3& pivot = picker.rotation.pivot;
 				const vec3& axis = picker.rotation.axis;
-				mat4 rotMatrix = rotate(mat4(), 15.0f, axis);
+				mat4 rotMatrix = rotate(mat4(), delta, axis);
 				const vec3& v1 = picker.face[0]->center;
 				const vec3& v2 = picker.face[1]->center;
 				if(pivot.x == v1.x && pivot.x == v2.x)
@@ -183,7 +183,7 @@ int main()
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
 
-		if(picker.angle == 0)
+		if(picker.face[0] != NULL && picker.face[1] != NULL && picker.angle == 0)
 			picker.face[0] = picker.face[1] = NULL;
 
 		glfwSwapBuffers(window);

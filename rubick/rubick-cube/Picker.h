@@ -22,6 +22,6 @@ public:
 	
 //private:
 
-	int angle;
+	float angle;
 	Face* face[2];
 };

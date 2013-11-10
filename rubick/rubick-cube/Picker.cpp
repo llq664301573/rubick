@@ -5,15 +5,64 @@
 #include "global.h"
 #include "utility.h"
 
-
-
 Picker::Picker():angle(0)
 {
 	face[0] = face[1] = NULL;
 }
 
+void Picker::picking(double xpos, double ypos, int width, int height)
+{
+	if(face[0] == NULL || face[1] == NULL)
+	{
+		vec4 v;
+		v.x = (2.0f*xpos - width) / width;
+		v.y = (height - 2.0f*ypos) / height;  
+		v.z = -1.0f;//[-1, 1] 由近及远
+		v.w = 1;
+
+		// Transform the screen space Picker ray into 3D space
+		v = inverse(projection * view) * v;
+
+		vec3 vPickRayOrig = vec3(v.x / v.w, v.y / v.w, v.z / v.w);//屏幕鼠标点世界空间坐标
+		vec3 vPickRayDir = vPickRayOrig - eye;
+
+		for (int i=0;i<faces.size();i++)
+		{
+			Face *face = faces[i];
+			Cube *cube = face->cube;
+			const float *pbuffer = vertex_buffer_data + face->index * 18;//3*3*2
+
+			for (int i=0;i<2;i++)//每个面两个三角形
+			{
+				vec3 vertex[3];
+				for (int k=0;k<3;k++)//三角形上三点
+				{
+					vec4 v = vec4(pbuffer[i*9+k*3], pbuffer[i*9+k*3+1], pbuffer[i*9+k*3+2], 1);
+					v = camera * scroll * cube->modelMatrix * v;//变换到世界空间
+
+					vertex[k] = vec3(v.x, v.y, v.z);
+				}
+
+				float t, u, v;
+				if(IntersectTriangle(vPickRayOrig, vPickRayDir, vertex[0], vertex[1], vertex[2], &t, &u, &v))
+				{
+					if(this->face[0] == NULL)
+						this->face[0] = face;
+					else
+						this->face[1] = face;
+					
+					return ;
+				}
+			}
+		}
+	}
+}
+
 bool Picker::tryRotary()
 {
+	if(angle != 0)//正在旋转
+		return false;
+
 	if(face[0] == NULL || face[1] == NULL)
 		return false;
 
@@ -25,7 +74,7 @@ bool Picker::tryRotary()
 	else
 	{
 		const vec3 axis[] = {vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)};
-		const vec3 size = Cube::size;
+		const vec3& size = Cube::size;
 		bool doubling[] = {size.y != size.z, size.x != size.z, size.x != size.y};
 		float vec3::* fields[] = {&vec3::x, &vec3::y, &vec3::z};
 
@@ -111,54 +160,4 @@ bool Picker::tryRotary()
 
 	face[0] = face[1] = NULL;
 	return false;
-}
-
-void Picker::picking(double xpos, double ypos, int width, int height)
-{
-	if(face[0] == NULL || face[1] == NULL)
-	{
-		vec4 v;
-		v.x = (2.0f*xpos - width) / width;
-		v.y = (height - 2.0f*ypos) / height;  
-		v.z = -1.0f;//[-1, 1] 由近及远
-		v.w = 1;
-
-		// Transform the screen space Picker ray into 3D space
-		//v = inverse(projection * view) * v;
-		v = inverse(projection) * v;
-		v = inverse(view) * v;
-
-		vec3 vPickRayOrig = vec3(v.x / v.w, v.y / v.w, v.z / v.w);//屏幕鼠标点世界空间坐标
-		vec3 vPickRayDir = vPickRayOrig - eye;
-
-		for (int i=0;i<faces.size();i++)
-		{
-			Face *face = faces[i];
-			Cube *cube = face->cube;
-			const float *pbuffer = vertex_buffer_data + face->index * 18;//3*3*2
-
-			for (int i=0;i<2;i++)//每个面两个三角形
-			{
-				vec3 vertex[3];
-				for (int k=0;k<3;k++)//三角形上三点
-				{
-					vec4 v = vec4(pbuffer[i*9+k*3], pbuffer[i*9+k*3+1], pbuffer[i*9+k*3+2], 1);
-					v = camera * scroll * cube->modelMatrix * v;//变换到世界空间
-
-					vertex[k] = vec3(v.x, v.y, v.z);
-				}
-
-				float t, u, v;
-				if(IntersectTriangle(vPickRayOrig, vPickRayDir, vertex[0], vertex[1], vertex[2], &t, &u, &v))
-				{
-					if(this->face[0] == NULL)
-						this->face[0] = face;
-					else
-						this->face[1] = face;
-					
-					return ;
-				}
-			}
-		}
-	}
 }

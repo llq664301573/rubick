@@ -7,13 +7,12 @@ using namespace libconfig;
 
 vec3 Cube::size;
 
-Cube::Cube(int8 x, int8 y, int8 z, int index)
+Cube::Cube(int8 x, int8 y, int8 z)
 {
 	pos.x = x;
 	pos.y = y;
 	pos.z = z;
 	pos.w = 1;
-	this->index = index;
 	modelMatrix = translate(mat4(), vec3(x, y, z));
 }
 
@@ -63,14 +62,13 @@ bool Cube::init(vector<Cube*> &cubes)
 	const int yMax = ySize / 2 * 2 - (ySize % 2 == 0);
 	const int zMax = zSize / 2 * 2 - (zSize % 2 == 0);
 
-	int cnt = 0;
 	for (int z = -zMax; z <= zMax; z+=2)
 	{
 		for (int y = -yMax; y <= yMax; y+=2)
 		{
 			for (int x = -xMax; x <= xMax; x+=2)
 			{
-				Cube *cube = new Cube(x, y, z, cnt++);
+				Cube *cube = new Cube(x, y, z);
 				bool visible[]={x == -xMax, x == xMax, y == -yMax, y == yMax, z == -zMax, z == zMax};
 				for (int i=0;i<6;i++)
 				{
